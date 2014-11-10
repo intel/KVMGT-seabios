@@ -17,6 +17,8 @@
 #include "hw/megasas.h" // megasas_setup
 #include "hw/pvscsi.h" // pvscsi_setup
 #include "hw/pic.h" // pic_setup
+#include "hw/pci.h" // pci_config_writel
+#include "hw/pci_regs.h" // PCI_VENDOR_ID
 #include "hw/ps2port.h" // ps2port_setup
 #include "hw/rtc.h" // rtc_write
 #include "hw/serialio.h" // serial_debug_preinit
@@ -28,7 +30,6 @@
 #include "output.h" // dprintf
 #include "string.h" // memset
 #include "util.h" // kbd_init
-
 
 /****************************************************************
  * BIOS initialization and hardware setup
@@ -199,6 +200,8 @@ startBoot(void)
     memset((void*)BUILD_STACK_ADDR, 0, BUILD_EBDA_MINIMUM - BUILD_STACK_ADDR);
 
     dprintf(3, "Jump to int19\n");
+    //Tell QEMU the POST is done
+    pci_config_writel(pci_to_bdf(0, 0, 0), PCI_VENDOR_ID, 0xB105DEAD);
     struct bregs br;
     memset(&br, 0, sizeof(br));
     br.flags = F_IF;
