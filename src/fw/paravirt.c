@@ -156,17 +156,19 @@ qemu_platform_setup(void)
 
         loader_err = romfile_loader_execute("etc/table-loader");
 
-        RsdpAddr = find_acpi_rsdp();
-
-        if (RsdpAddr)
-            return;
-
         /* If present, loader should have installed an RSDP.
          * Not installed? We might still be able to continue
          * using the builtin RSDP.
          */
-        if (!loader_err)
+        if (!loader_err) {
             warn_internalerror();
+        } else {
+            RsdpAddr = find_acpi_rsdp();
+
+	    if (RsdpAddr)
+                return;
+        }
+
     }
 
     acpi_setup();
